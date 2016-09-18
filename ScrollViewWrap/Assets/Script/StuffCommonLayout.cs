@@ -61,12 +61,12 @@ namespace Util
         private Dictionary<int, List<ChildInfo>> childTeamMap = new Dictionary<int, List<ChildInfo>>();
         private HashSet<ChildInfo> pageStartChild = new HashSet<ChildInfo>();
         private List<ChildInfo> childInfoList = new List<ChildInfo>();
-        private IScrollViewChild[] dataCacheArray = null;
-        private IStuff[] stuffCacheArray = null;
+        private IStuff[] dataCacheArray = null;
+        //private IStuff[] stuffCacheArray = null;
 
         private string childName = null;
 
-        private bool isHorizontal = true; // 方向
+        public bool isHorizontal = true; // 方向
         private bool isActiveSuperfluousChildObj = false; //是否显示多余的childObj
         private bool isContactEdge = false; //移动时是否达到了边界
 
@@ -117,10 +117,7 @@ namespace Util
             if (null == mChild) mChild = mParent.GetChild(0);
             if (null == mChild) return false;
             childName = mChild.gameObject.name;
-            childInfoList.Add(new ChildInfo(mChild.gameObject));
-            childBounds = NGUIMath.CalculateRelativeWidgetBounds(mChild, true);
-            isHorizontal = mScroll.movement == UIScrollView.Movement.Horizontal ? true : false;
-            isAutoTrim = isPageMode ? true : isAutoTrim;
+            
 
             //check scrollview
             if (null == mScroll) mScroll = mParent.parent.GetComponent<UIScrollView>();
@@ -145,6 +142,12 @@ namespace Util
                 mScroll.onDragFinished = null;
                 if (isAutoTrim) mScroll.onDragFinished = () => { trimOnDragFinish(); };
             }
+
+            childInfoList.Add(new ChildInfo(mChild.gameObject));
+            childBounds = NGUIMath.CalculateRelativeWidgetBounds(mChild, true);
+            isHorizontal = null != mScroll ? (mScroll.movement == UIScrollView.Movement.Horizontal ? true : false) : true;
+            isAutoTrim = isPageMode ? true : isAutoTrim;
+
             return true;
         }
 
@@ -249,10 +252,13 @@ namespace Util
             {
                 if (isPageMode)
                 {
-                    childRowsStartIndex = -alignOffset;
+                    //childRowsStartIndex = -alignOffset;
                 }
                 else 
                 {
+
+
+
                     if (isHorizontal)
                     {
                         cellColsStartIndex = -alignOffset;
@@ -281,28 +287,28 @@ namespace Util
                         if(it_cell.MoveNext())
                         {
                             //TransData td = cellList[_objIndex];
-                            ChildInfo td = it_cell.Current;
+                            //ChildInfo td = it_cell.Current;
                             float posX = leftTopCellHangingPoint.x + childSize.x * j;
                             float poxY = leftTopCellHangingPoint.y - childSize.y * i;
-                            td.originalHangingPoint = new Vector3(posX, poxY, mChild.localPosition.z);
-                            td.obj.transform.localPosition = td.originalHangingPoint;
+                            it_cell.Current.originalHangingPoint = new Vector3(posX, poxY, mChild.localPosition.z);
+                            it_cell.Current.obj.transform.localPosition = it_cell.Current.originalHangingPoint;
 
                             int teamIndex = isHorizontal ? j : i;
                             int indexInTeam = isHorizontal ? i : j;
 
                             //td.rowIndex = i;
-                            td.rowIndex = getCalculatedRowIndex(i, alignOffset);
-                            td.colIndex = getCalculatedColIndex(j, alignOffset);
-                            updateChild(td);
+                            it_cell.Current.rowIndex = getCalculatedRowIndex(i, alignOffset);
+                            it_cell.Current.colIndex = getCalculatedColIndex(j, alignOffset);
+                            updateChild(it_cell.Current);
 
                             if (!childTeamMap.ContainsKey(teamIndex)) childTeamMap.Add(teamIndex, new List<ChildInfo>());
-                            if (!childTeamMap[teamIndex].Contains(td)) childTeamMap[teamIndex].Add(td);
-                            if (teamIndex % childTeamNumPerPage == 0) pageStartChild.Add(td);
+                            if (!childTeamMap[teamIndex].Contains(it_cell.Current)) childTeamMap[teamIndex].Add(it_cell.Current);
+                            if (teamIndex % childTeamNumPerPage == 0) pageStartChild.Add(it_cell.Current);
 
                             if (i == 0 && j == 0)
                             {
-                                closestCellToLeftTop = td;
-                                closestPageStartCellToLeftTop = td;
+                                closestCellToLeftTop = it_cell.Current;
+                                closestPageStartCellToLeftTop = it_cell.Current;
                             }
                         }
                     }
@@ -346,7 +352,7 @@ namespace Util
                     float distance = firstTd.obj.transform.localPosition.x - center.x;
                     if (distance < -halfCellTeamAmountSpan) //向左
                     {
-                        if (firstTd.colIndex + childTeamAmount + alignOffset < logicallyChildTeamMaxNum)
+                        if (firstTd.colIndex + childTeamAmount /*+ alignOffset*/ < logicallyChildTeamMaxNum)
                         {
                             setTeamPosWhenWrap(team, childWarpSpan);
                             setTeamDataWhenWrap(team, false, childTeamAmount);
@@ -365,7 +371,7 @@ namespace Util
                     }
                     else if (distance > halfCellTeamAmountSpan) //向右
                     {
-                        if (firstTd.colIndex + 1 + alignOffset - childTeamAmount > 0)
+                        if (firstTd.colIndex + 1 /*+ alignOffset*/ - childTeamAmount > 0)
                         {
                             setTeamPosWhenWrap(team, -childWarpSpan);
                             setTeamDataWhenWrap(team, false, -childTeamAmount);
@@ -379,7 +385,6 @@ namespace Util
                                 setTeamDataWhenWrap(team, false, logicallyChildTeamMaxNum - childTeamAmount);
                                 isContactEdge = true;
                             }
-                            
                         }
                     }
                 }
@@ -409,7 +414,7 @@ namespace Util
                     float distance = firstTd.obj.transform.localPosition.y - center.y;
                     if (distance < -halfCellTeamAmountSpan) //向下
                     {
-                        if (firstTd.rowIndex + 1 + alignOffset - childTeamAmount > 0) //这种计算方式会有问题 >= 与 > 有区别 在初始位置设定的情况下 与“向右” 情况不一致
+                        if (firstTd.rowIndex + 1 /*+ alignOffset*/ - childTeamAmount > 0) //这种计算方式会有问题 >= 与 > 有区别 在初始位置设定的情况下 与“向右” 情况不一致
                         {
                             setTeamPosWhenWrap(team, childWarpSpan);
                             setTeamDataWhenWrap(team, true, -childTeamAmount);
@@ -428,7 +433,7 @@ namespace Util
                     }
                     else if (distance > halfCellTeamAmountSpan) //向上
                     {
-                        if (firstTd.rowIndex + childTeamAmount + alignOffset < logicallyChildTeamMaxNum)
+                        if (firstTd.rowIndex + childTeamAmount /*+ alignOffset*/ < logicallyChildTeamMaxNum)
                         {
                             setTeamPosWhenWrap(team, -childWarpSpan);
                             setTeamDataWhenWrap(team, true, childTeamAmount);
@@ -507,14 +512,10 @@ namespace Util
             int _dataIndex = isHorizontal ? (isPageMode ? getDataIndexInPageMode(td.rowIndex, td.colIndex) : _objIndex) : _objIndex;
 
 
-
-
-
             if (null != dataCacheArray && _dataIndex >= 0 && _dataIndex < dataCacheArray.Length)
             {
                 td.dataIndex = _dataIndex;
-                dataCacheArray[_dataIndex].SetContentOn(td.obj.transform);
-                UIEventListener.Get(td.obj).onClick = dataCacheArray[_dataIndex].OnChildClick;
+                dataCacheArray[_dataIndex].SetContentOn(td.obj.transform);             
                 td.obj.SetActive(true);
                 setChildName(td, _objIndex);
             }
@@ -778,12 +779,12 @@ namespace Util
         //    return null;
         //}
 
-        public void display(params IScrollViewChild[] dataArray)
+        public void display(params IStuff[] dataArray)
         {
             display(0, 0, dataArray);
         }
 
-        public void display(int alignTargetIndex = 0, int alignTo = 0, params IScrollViewChild[] dataArray) // alignTo 是目标所在的Team的位置 因此小于每页的team
+        public void display(int alignTargetIndex = 0, int alignTo = 0, params IStuff[] dataArray) // alignTo 是目标所在的Team的位置 因此小于每页的team
         {
             //  alignPos
             dataCacheArray = dataArray;
@@ -803,7 +804,7 @@ namespace Util
             }
         }
 
-        public void RefreshByReset(bool isReset, params IScrollViewChild[] dataArray)
+        public void RefreshByReset(bool isReset, params IStuff[] dataArray)
         {
             int alignTargetIndex = isPageMode ?
                 (null != closestPageStartCellToLeftTop ? closestPageStartCellToLeftTop.dataIndex : 0) :

@@ -6,21 +6,21 @@ using Util;
 
 public class TestObject1: MonoBehaviour {
 
-    public ScrollViewWrap svw;
+    public StuffCommonLayout svw;
 
     void Awake() 
     {
         Transform parentTrans = transform.Find("ScrollView/Parent");
-        svw = ScrollViewWrap.configure(parentTrans, 5, 4, false, false, true);
+        svw = StuffCommonLayout.configure(parentTrans, 5, 4, false, false, true);
     }
 
 	void Start () {
         List<WarpDate> dataList = new List<WarpDate>();
-        for (int i = 0; i < 24; i++) 
+        for (int i = 0; i < 47; i++) 
         {
             dataList.Add(new WarpDate(i, dataList, svw));
         }
-        svw.display(dataList.ToArray());
+        svw.display(4,0,dataList.ToArray());
 	
 	}
 	
@@ -30,13 +30,13 @@ public class TestObject1: MonoBehaviour {
 	}
 
 
-    public class WarpDate : IScrollViewChild
+    public class WarpDate : IStuff
     {
         int id;
         List<WarpDate> list;
-        ScrollViewWrap svw;
+        StuffCommonLayout svw;
 
-        public WarpDate(int id, List<WarpDate> list, ScrollViewWrap svw) 
+        public WarpDate(int id, List<WarpDate> list, StuffCommonLayout svw) 
         {
             this.id = id;
             this.list = list;
@@ -46,6 +46,7 @@ public class TestObject1: MonoBehaviour {
         public void SetContentOn(Transform trans) 
         {
             trans.Find("Label").GetComponent<UILabel>().text = id.ToString();
+            UIEventListener.Get(trans.gameObject).onClick = OnChildClick;
         }
 
         public void OnChildClick(GameObject go) 
