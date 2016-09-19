@@ -310,6 +310,12 @@ namespace Util
                         }
                     }
                 }
+
+                //把剩下的obj隐藏
+                while (it_cell.MoveNext()) 
+                {
+                    it_cell.Current.obj.SetActive(isActiveSuperfluousChildObj);
+                }
             }
             offsetOfClosestCellToLeftTop = 0f;
             currentPageIndex = alignOffset / childTeamNumPerPage;
@@ -507,8 +513,6 @@ namespace Util
         {
             int _objIndex = childColumns * td.rowIndex + td.colIndex;
             int _dataIndex = isHorizontal ? (isPageMode ? getDataIndexInPageMode(td.rowIndex, td.colIndex) : _objIndex) : _objIndex;
-
-
             if (null != dataCacheArray && _dataIndex >= 0 && _dataIndex < dataCacheArray.Length)
             {
                 td.dataIndex = _dataIndex;

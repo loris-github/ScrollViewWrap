@@ -16,7 +16,7 @@ public class TestObject1: MonoBehaviour {
 
 	void Start () {
         List<WarpDate> dataList = new List<WarpDate>();
-        for (int i = 0; i < 47; i++) 
+        for (int i = 0; i < 22; i++) 
         {
             dataList.Add(new WarpDate(i, dataList, svw));
         }
