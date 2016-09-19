@@ -256,16 +256,13 @@ namespace Util
                 }
                 else 
                 {
-
-
-
                     if (isHorizontal)
                     {
-                        cellColsStartIndex = -alignOffset;
+                        cellColsStartIndex = -(alignOffset <= hiddenChildTeamNum ? alignOffset : hiddenChildTeamNum);
                     }
                     else 
                     {
-                        childRowsStartIndex = -alignOffset;
+                        childRowsStartIndex = -(alignOffset <= hiddenChildTeamNum ? alignOffset : hiddenChildTeamNum);
                     }
                 }
             }
