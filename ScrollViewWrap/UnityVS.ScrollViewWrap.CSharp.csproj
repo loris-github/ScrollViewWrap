@@ -199,7 +199,6 @@
     <Compile Include="Assets\Script\Pagination.cs" />
     <Compile Include="Assets\Script\ScrollViewWrap.cs" />
     <Compile Include="Assets\Script\StuffCommonLayout.cs" />
-    <Compile Include="Assets\Script\TestObject.cs" />
     <Compile Include="Assets\Script\TestObject1.cs" />
   </ItemGroup>
   <ItemGroup>

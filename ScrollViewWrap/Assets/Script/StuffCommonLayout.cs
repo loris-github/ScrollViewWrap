@@ -19,7 +19,7 @@ namespace Util
             public int dataIndex;   // 数据在dataCacheList里的位置 除以最大显示个数之后也是childObjectCacheList缓存中的位置
             public int rowIndex;
             public int colIndex;
-            public Vector3 originalHangingPoint; //用于记录初始化的位置
+            //public Vector3 originalHangingPoint; //用于记录初始化的位置
 
             public ChildInfo() { }
             public ChildInfo(GameObject childObj)
@@ -28,13 +28,8 @@ namespace Util
                 this.dataIndex = -1;
                 this.rowIndex = -1;
                 this.colIndex = -1;
-                this.originalHangingPoint = Vector3.zero;
+                //this.originalHangingPoint = Vector3.zero;
             }
-        }
-
-        public class ChildGroup 
-        {
-            
         }
 
         // page 可显示的范围 即clip范围
@@ -287,8 +282,8 @@ namespace Util
                             //ChildInfo td = it_cell.Current;
                             float posX = leftTopCellHangingPoint.x + childSize.x * j;
                             float poxY = leftTopCellHangingPoint.y - childSize.y * i;
-                            it_cell.Current.originalHangingPoint = new Vector3(posX, poxY, mChild.localPosition.z);
-                            it_cell.Current.obj.transform.localPosition = it_cell.Current.originalHangingPoint;
+                            //it_cell.Current.originalHangingPoint = new Vector3(posX, poxY, mChild.localPosition.z);
+                            it_cell.Current.obj.transform.localPosition = new Vector3(posX, poxY, mChild.localPosition.z);
 
                             int teamIndex = isHorizontal ? j : i;
                             int indexInTeam = isHorizontal ? i : j;
@@ -431,7 +426,6 @@ namespace Util
                                 setTeamDataWhenWrap(team, true, logicallyChildTeamMaxNum - childTeamAmount);
                                 isContactEdge = true;
                             }
-                            
                         }
                     }
                     else if (distance > halfCellTeamAmountSpan) //向上
@@ -762,24 +756,6 @@ namespace Util
 
         // =====================================================================================
         // 外部常用方法
-
-        //public Transform getChildTransform(int _dataIndex)
-        //{
-        //    var it_CellTeam = cellTeamMap.GetEnumerator();
-        //    while (it_CellTeam.MoveNext())
-        //    {
-        //        var it_Cell = it_CellTeam.Current.Value.GetEnumerator();
-        //        while (it_Cell.MoveNext())
-        //        {
-        //            if (it_Cell.Current.dataIndex == _dataIndex)
-        //            {
-        //                return it_Cell.Current.obj.transform;
-        //            }
-        //        }
-        //    }
-        //    return null;
-        //}
-
         public void display(params IStuff[] dataArray)
         {
             display(0, 0, dataArray);
@@ -836,8 +812,6 @@ namespace Util
                 scl.isPageMode = isPageMode;
                 scl.isLoop = isLoop;
                 scl.isAutoTrim = isAutoTrim;
-                //scl.isCellMatchChildBound = !isAutoTrim && (row == 0 || col == 0);
-                //svw.init();
                 if (!scl.checkStructureAndInit()) Debug.Log("Initialise failed!!!!");
             }
             return scl;
