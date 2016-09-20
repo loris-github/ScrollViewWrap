@@ -350,7 +350,7 @@ namespace Util
                     float distance = firstTd.obj.transform.localPosition.x - center.x;
                     if (distance < -halfCellTeamAmountSpan) //向左
                     {
-                        if (firstTd.colIndex + childTeamAmount /*+ alignOffset*/ < logicallyChildTeamMaxNum)
+                        if (firstTd.colIndex + childTeamAmount < logicallyChildTeamMaxNum)
                         {
                             setTeamPosWhenWrap(team, childWarpSpan);
                             setTeamDataWhenWrap(team, false, childTeamAmount);
@@ -369,7 +369,7 @@ namespace Util
                     }
                     else if (distance > halfCellTeamAmountSpan) //向右
                     {
-                        if (firstTd.colIndex + 1 /*+ alignOffset*/ - childTeamAmount > 0)
+                        if (firstTd.colIndex + 1 - childTeamAmount > 0)
                         {
                             setTeamPosWhenWrap(team, -childWarpSpan);
                             setTeamDataWhenWrap(team, false, -childTeamAmount);
@@ -410,13 +410,15 @@ namespace Util
                     }
 
                     float distance = firstTd.obj.transform.localPosition.y - center.y;
+
                     if (distance < -halfCellTeamAmountSpan) //向下
                     {
-                        if (firstTd.rowIndex + 1 /*+ alignOffset*/ - childTeamAmount > 0) //这种计算方式会有问题 >= 与 > 有区别 在初始位置设定的情况下 与“向右” 情况不一致
+                        isContactEdge = firstTd.rowIndex + 1  - childTeamAmount <= 0;
+                        if (firstTd.rowIndex + 1  - childTeamAmount > 0) //这种计算方式会有问题 >= 与 > 有区别 在初始位置设定的情况下 与“向右” 情况不一致
                         {
                             setTeamPosWhenWrap(team, childWarpSpan);
                             setTeamDataWhenWrap(team, true, -childTeamAmount);
-                            isContactEdge = false;
+                            //isContactEdge = false;
                         }
                         else
                         {
@@ -424,17 +426,18 @@ namespace Util
                             {
                                 setTeamPosWhenWrap(team, childWarpSpan);
                                 setTeamDataWhenWrap(team, true, logicallyChildTeamMaxNum - childTeamAmount);
-                                isContactEdge = true;
+                                //isContactEdge = true;
                             }
                         }
                     }
                     else if (distance > halfCellTeamAmountSpan) //向上
                     {
-                        if (firstTd.rowIndex + childTeamAmount /*+ alignOffset*/ < logicallyChildTeamMaxNum)
+                        isContactEdge = firstTd.rowIndex + childTeamAmount >= logicallyChildTeamMaxNum;
+                        if (firstTd.rowIndex + childTeamAmount < logicallyChildTeamMaxNum)
                         {
                             setTeamPosWhenWrap(team, -childWarpSpan);
                             setTeamDataWhenWrap(team, true, childTeamAmount);
-                            isContactEdge = false;
+                            //isContactEdge = false;
                         }
                         else
                         {
@@ -442,8 +445,8 @@ namespace Util
                             {
                                 setTeamPosWhenWrap(team, -childWarpSpan);
                                 setTeamDataWhenWrap(team, true, childTeamAmount - logicallyChildTeamMaxNum);
+                                //isContactEdge = true;
                             }
-                            isContactEdge = true;
                         }
                     }
                 }
@@ -463,6 +466,7 @@ namespace Util
                 if (null != closestCellToLeftTop)
                 {
                     springOffset = closestCellToLeftTop.obj.transform.localPosition - leftTopCellHangingPoint;
+                    Debug.Log("dataIndex Of closestCellToLeftTop is " + closestCellToLeftTop.dataIndex.ToString());
                     int teamIndex = getLogicallyTeamIndexByDataIndex(closestCellToLeftTop.dataIndex);
                     currentPageIndex = teamIndex / childTeamNumPerPage;
                 }
@@ -620,6 +624,7 @@ namespace Util
 
         private void trim()
         {
+            Debug.Log("======================> trim");
             mScroll.currentMomentum = Vector3.zero;
             if (!mScroll.canMoveHorizontally) springOffset.x = 0f;
             if (!mScroll.canMoveVertically) springOffset.y = 0f;
