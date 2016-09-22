@@ -135,7 +135,7 @@ namespace Util
                 if (null != verScrollBar) EventDelegate.Remove(verScrollBar.onChange, mScroll.OnScrollBar);
 
                 mScroll.onDragFinished = null;
-                if (isAutoTrim) mScroll.onDragFinished = () => { trimOnDragFinish(); };
+                //if (isAutoTrim) mScroll.onDragFinished = () => { trimOnDragFinish(); };
             }
 
             childInfoList.Add(new ChildInfo(mChild.gameObject));
@@ -475,6 +475,9 @@ namespace Util
             //Debug.Log("当前的的页数是 =============》 " + currentPageIndex);
             if (null != pagination)
                 pagination.updateView(currentPageIndex + 1);
+
+
+            if (!mScroll.isDragging) trimOnDragFinish();
         }
 
         private void setTeamPosWhenWrap(List<ChildInfo> team, Vector3 posOffset)
