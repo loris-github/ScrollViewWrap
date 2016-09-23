@@ -348,13 +348,13 @@ namespace Util
                     }
 
                     float distance = firstTd.obj.transform.localPosition.x - center.x;
-                    if (distance < -halfCellTeamAmountSpan) //向左
+                    if (distance < -halfCellTeamAmountSpan) //向左 / 向下
                     {
+                        isContactEdge = firstTd.colIndex + childTeamAmount > logicallyChildTeamMaxNum;
                         if (firstTd.colIndex + childTeamAmount < logicallyChildTeamMaxNum)
                         {
                             setTeamPosWhenWrap(team, childWarpSpan);
                             setTeamDataWhenWrap(team, false, childTeamAmount);
-                            isContactEdge = false;
                         }
                         else
                         {
@@ -363,17 +363,15 @@ namespace Util
                                 setTeamPosWhenWrap(team, childWarpSpan);
                                 setTeamDataWhenWrap(team, false, childTeamAmount - logicallyChildTeamMaxNum);
                             }
-                            isContactEdge = true;
-                            
                         }
                     }
-                    else if (distance > halfCellTeamAmountSpan) //向右
+                    else if (distance > halfCellTeamAmountSpan) //向右 / 向上
                     {
+                        isContactEdge = firstTd.colIndex + 1 - childTeamAmount < 0;
                         if (firstTd.colIndex + 1 - childTeamAmount > 0)
                         {
                             setTeamPosWhenWrap(team, -childWarpSpan);
                             setTeamDataWhenWrap(team, false, -childTeamAmount);
-                            isContactEdge = false;
                         }
                         else
                         {
@@ -381,7 +379,6 @@ namespace Util
                             {
                                 setTeamPosWhenWrap(team, -childWarpSpan);
                                 setTeamDataWhenWrap(team, false, logicallyChildTeamMaxNum - childTeamAmount);
-                                isContactEdge = true;
                             }
                         }
                     }
@@ -413,12 +410,11 @@ namespace Util
 
                     if (distance < -halfCellTeamAmountSpan) //向下
                     {
-                        isContactEdge = firstTd.rowIndex + 1  - childTeamAmount <= 0;
+                        isContactEdge = firstTd.rowIndex + 1  - childTeamAmount < 0;
                         if (firstTd.rowIndex + 1  - childTeamAmount > 0) //这种计算方式会有问题 >= 与 > 有区别 在初始位置设定的情况下 与“向右” 情况不一致
                         {
                             setTeamPosWhenWrap(team, childWarpSpan);
                             setTeamDataWhenWrap(team, true, -childTeamAmount);
-                            //isContactEdge = false;
                         }
                         else
                         {
@@ -426,18 +422,16 @@ namespace Util
                             {
                                 setTeamPosWhenWrap(team, childWarpSpan);
                                 setTeamDataWhenWrap(team, true, logicallyChildTeamMaxNum - childTeamAmount);
-                                //isContactEdge = true;
                             }
                         }
                     }
                     else if (distance > halfCellTeamAmountSpan) //向上
                     {
-                        isContactEdge = firstTd.rowIndex + childTeamAmount >= logicallyChildTeamMaxNum;
+                        isContactEdge = firstTd.rowIndex + childTeamAmount > logicallyChildTeamMaxNum;
                         if (firstTd.rowIndex + childTeamAmount < logicallyChildTeamMaxNum)
                         {
                             setTeamPosWhenWrap(team, -childWarpSpan);
                             setTeamDataWhenWrap(team, true, childTeamAmount);
-                            //isContactEdge = false;
                         }
                         else
                         {
@@ -445,7 +439,6 @@ namespace Util
                             {
                                 setTeamPosWhenWrap(team, -childWarpSpan);
                                 setTeamDataWhenWrap(team, true, childTeamAmount - logicallyChildTeamMaxNum);
-                                //isContactEdge = true;
                             }
                         }
                     }
@@ -466,16 +459,13 @@ namespace Util
                 if (null != closestCellToLeftTop)
                 {
                     springOffset = closestCellToLeftTop.obj.transform.localPosition - leftTopCellHangingPoint;
-                    Debug.Log("dataIndex Of closestCellToLeftTop is " + closestCellToLeftTop.dataIndex.ToString());
                     int teamIndex = getLogicallyTeamIndexByDataIndex(closestCellToLeftTop.dataIndex);
                     currentPageIndex = teamIndex / childTeamNumPerPage;
                 }
             }
             updateProgressBar();
-            //Debug.Log("当前的的页数是 =============》 " + currentPageIndex);
             if (null != pagination)
                 pagination.updateView(currentPageIndex + 1);
-
 
             if (!mScroll.isDragging) trimOnDragFinish();
         }
@@ -627,7 +617,6 @@ namespace Util
 
         private void trim()
         {
-            Debug.Log("======================> trim");
             mScroll.currentMomentum = Vector3.zero;
             if (!mScroll.canMoveHorizontally) springOffset.x = 0f;
             if (!mScroll.canMoveVertically) springOffset.y = 0f;
@@ -735,7 +724,6 @@ namespace Util
 
         private int getCalculatedColIndex(int colIndex, int alignOffset)
         {
-            //int calculatedColIndex = colIndex + pageStartChildLogicallyTeamIndex;
             int calculatedColIndex = isHorizontal ? alignOffset + colIndex : colIndex;
             if (calculatedColIndex >= logicallyChildTeamMaxNum)
             {
