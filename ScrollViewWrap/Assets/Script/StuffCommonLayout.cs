@@ -347,14 +347,14 @@ namespace Util
                         if (firstTd.colIndex + childTeamAmount < logicallyChildTeamMaxNum)
                         {
                             setTeamPosWhenWrap(team, childWarpSpan);
-                            setTeamDataWhenWrap(team, false, childTeamAmount);
+                            setTeamDataWhenWrap(team, childTeamAmount);
                         }
                         else
                         {
                             if (isLoop)
                             {
                                 setTeamPosWhenWrap(team, childWarpSpan);
-                                setTeamDataWhenWrap(team, false, childTeamAmount - logicallyChildTeamMaxNum);
+                                setTeamDataWhenWrap(team, childTeamAmount - logicallyChildTeamMaxNum);
                             }
                         }
                     }
@@ -364,14 +364,14 @@ namespace Util
                         if (firstTd.colIndex + 1 - childTeamAmount > 0)
                         {
                             setTeamPosWhenWrap(team, -childWarpSpan);
-                            setTeamDataWhenWrap(team, false, -childTeamAmount);
+                            setTeamDataWhenWrap(team, -childTeamAmount);
                         }
                         else
                         {
                             if (isLoop)
                             {
                                 setTeamPosWhenWrap(team, -childWarpSpan);
-                                setTeamDataWhenWrap(team, false, logicallyChildTeamMaxNum - childTeamAmount);
+                                setTeamDataWhenWrap(team, logicallyChildTeamMaxNum - childTeamAmount);
                             }
                         }
                     }
@@ -382,17 +382,17 @@ namespace Util
                     if (distance < -halfCellTeamAmountSpan) //向下
                     {
                         isContactEdge = firstTd.rowIndex + 1 - childTeamAmount < 0;
-                        if (firstTd.rowIndex + 1 - childTeamAmount > 0) //这种计算方式会有问题 >= 与 > 有区别 在初始位置设定的情况下 与“向右” 情况不一致
+                        if (firstTd.rowIndex + 1 - childTeamAmount > 0) 
                         {
                             setTeamPosWhenWrap(team, childWarpSpan);
-                            setTeamDataWhenWrap(team, true, -childTeamAmount);
+                            setTeamDataWhenWrap(team, -childTeamAmount);
                         }
                         else
                         {
                             if (isLoop)
                             {
                                 setTeamPosWhenWrap(team, childWarpSpan);
-                                setTeamDataWhenWrap(team, true, logicallyChildTeamMaxNum - childTeamAmount);
+                                setTeamDataWhenWrap(team, logicallyChildTeamMaxNum - childTeamAmount);
                             }
                         }
                     }
@@ -402,14 +402,14 @@ namespace Util
                         if (firstTd.rowIndex + childTeamAmount < logicallyChildTeamMaxNum)
                         {
                             setTeamPosWhenWrap(team, -childWarpSpan);
-                            setTeamDataWhenWrap(team, true, childTeamAmount);
+                            setTeamDataWhenWrap(team, childTeamAmount);
                         }
                         else
                         {
                             if (isLoop)
                             {
                                 setTeamPosWhenWrap(team, -childWarpSpan);
-                                setTeamDataWhenWrap(team, true, childTeamAmount - logicallyChildTeamMaxNum);
+                                setTeamDataWhenWrap(team, childTeamAmount - logicallyChildTeamMaxNum);
                             }
                         }
                     }
@@ -450,10 +450,10 @@ namespace Util
             }
         }
 
-        private void setTeamDataWhenWrap(List<ChildInfo> team, bool isRow, int indexOffset)
+        private void setTeamDataWhenWrap(List<ChildInfo> team, int indexOffset)
         {
             var it_Cell = team.GetEnumerator();
-            if (isRow)
+            if (!isHorizontal)
             {
                 while (it_Cell.MoveNext())
                 {
