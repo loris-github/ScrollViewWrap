@@ -85,7 +85,6 @@ namespace Util
 
         private ChildInfo closestCellToLeftTop = null;
         private ChildInfo closestPageStartCellToLeftTop = null;
-        private float offsetOfClosestCellToLeftTop = 0f;
 
         private UIProgressBar horScrollBar;
         private UIProgressBar verScrollBar;
@@ -274,15 +273,10 @@ namespace Util
                 {
                     for (int j = cellColsStartIndex; j < childColumns; j++)
                     {
-                        //int _objIndex = getObjIndex(i, j);
-                        //if (_objIndex < cellList.Count)
                         if(it_cell.MoveNext())
                         {
-                            //TransData td = cellList[_objIndex];
-                            //ChildInfo td = it_cell.Current;
                             float posX = leftTopCellHangingPoint.x + childSize.x * j;
                             float poxY = leftTopCellHangingPoint.y - childSize.y * i;
-                            //it_cell.Current.originalHangingPoint = new Vector3(posX, poxY, mChild.localPosition.z);
                             it_cell.Current.obj.transform.localPosition = new Vector3(posX, poxY, mChild.localPosition.z);
 
                             int teamIndex = isHorizontal ? j : i;
@@ -312,7 +306,6 @@ namespace Util
                     it_cell.Current.obj.SetActive(isActiveSuperfluousChildObj);
                 }
             }
-            offsetOfClosestCellToLeftTop = 0f;
             currentPageIndex = alignOffset / childTeamNumPerPage;
             updateProgressBar();
         }
@@ -326,29 +319,29 @@ namespace Util
             float min_Cell = float.MaxValue;
             float min_PageStartCell = float.MaxValue;
 
-            if (isHorizontal)
+            
+            var it_Team = childTeamMap.GetEnumerator();
+            while (it_Team.MoveNext())
             {
-                var it_Team = childTeamMap.GetEnumerator();
-                while (it_Team.MoveNext())
+                List<ChildInfo> team = it_Team.Current.Value;
+                ChildInfo firstTd = team[0];
+                float sqrDist = Vector3.SqrMagnitude(firstTd.obj.transform.localPosition - pickingPoint);
+                if (sqrDist < min_Cell)
                 {
-                    List<ChildInfo> team = it_Team.Current.Value;
-                    ChildInfo firstTd = team[0];
-                    float sqrDist = Vector3.SqrMagnitude(firstTd.obj.transform.localPosition - pickingPoint);
-                    if (sqrDist < min_Cell)
-                    {
-                        min_Cell = sqrDist;
-                        closestCellToLeftTop = firstTd;
-                        offsetOfClosestCellToLeftTop = firstTd.obj.transform.localPosition.x - leftTopCellHangingPoint.x;
-                    };
+                    min_Cell = sqrDist;
+                    closestCellToLeftTop = firstTd;
+                };
 
-                    if (pageStartChild.Contains(firstTd) && sqrDist < min_PageStartCell)
-                    {
-                        min_PageStartCell = sqrDist;
-                        closestPageStartCellToLeftTop = firstTd;
-                    }
+                if (pageStartChild.Contains(firstTd) && sqrDist < min_PageStartCell)
+                {
+                    min_PageStartCell = sqrDist;
+                    closestPageStartCellToLeftTop = firstTd;
+                }
 
+                if (isHorizontal)
+                {
                     float distance = firstTd.obj.transform.localPosition.x - center.x;
-                    if (distance < -halfCellTeamAmountSpan) //向左 / 向下
+                    if (distance < -halfCellTeamAmountSpan) //向左
                     {
                         isContactEdge = firstTd.colIndex + childTeamAmount > logicallyChildTeamMaxNum;
                         if (firstTd.colIndex + childTeamAmount < logicallyChildTeamMaxNum)
@@ -365,7 +358,7 @@ namespace Util
                             }
                         }
                     }
-                    else if (distance > halfCellTeamAmountSpan) //向右 / 向上
+                    else if (distance > halfCellTeamAmountSpan) //向右
                     {
                         isContactEdge = firstTd.colIndex + 1 - childTeamAmount < 0;
                         if (firstTd.colIndex + 1 - childTeamAmount > 0)
@@ -383,35 +376,13 @@ namespace Util
                         }
                     }
                 }
-            }
-            else
-            {
-                var it_Team = childTeamMap.GetEnumerator();
-                while (it_Team.MoveNext())
+                else 
                 {
-                    List<ChildInfo> team = it_Team.Current.Value;
-                    ChildInfo firstTd = team[0];
-
-                    float sqrDist = Vector3.SqrMagnitude(firstTd.obj.transform.localPosition - pickingPoint);
-                    if (sqrDist < min_Cell)
-                    {
-                        min_Cell = sqrDist;
-                        closestCellToLeftTop = firstTd;
-                        offsetOfClosestCellToLeftTop = firstTd.obj.transform.localPosition.y - leftTopCellHangingPoint.y;
-                    };
-
-                    if (pageStartChild.Contains(firstTd) && sqrDist < min_PageStartCell)
-                    {
-                        min_PageStartCell = sqrDist;
-                        closestPageStartCellToLeftTop = firstTd;
-                    }
-
                     float distance = firstTd.obj.transform.localPosition.y - center.y;
-
                     if (distance < -halfCellTeamAmountSpan) //向下
                     {
-                        isContactEdge = firstTd.rowIndex + 1  - childTeamAmount < 0;
-                        if (firstTd.rowIndex + 1  - childTeamAmount > 0) //这种计算方式会有问题 >= 与 > 有区别 在初始位置设定的情况下 与“向右” 情况不一致
+                        isContactEdge = firstTd.rowIndex + 1 - childTeamAmount < 0;
+                        if (firstTd.rowIndex + 1 - childTeamAmount > 0) //这种计算方式会有问题 >= 与 > 有区别 在初始位置设定的情况下 与“向右” 情况不一致
                         {
                             setTeamPosWhenWrap(team, childWarpSpan);
                             setTeamDataWhenWrap(team, true, -childTeamAmount);
