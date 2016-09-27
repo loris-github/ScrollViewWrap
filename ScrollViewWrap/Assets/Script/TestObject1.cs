@@ -52,17 +52,17 @@ public class TestObject1: MonoBehaviour {
         public void OnChildClick(GameObject go) 
         {
             Debug.Log("当前的方块数字是：" + id);
-            bool isRemoved = false;
-            if (null != list && list.Contains(this))
-            {
-                isRemoved = list.Remove(this);
-            }
+            //bool isRemoved = false;
+            //if (null != list && list.Contains(this))
+            //{
+            //    isRemoved = list.Remove(this);
+            //}
 
-            if (isRemoved && null != svw)
-            {
-                svw.RefreshByReset(false, list.ToArray());
-            }
-
+            //if (isRemoved && null != svw)
+            //{
+            //    svw.RefreshByReset(false, list.ToArray());
+            //}
+            svw.testMoveUp();
         }
     }
 }

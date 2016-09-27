@@ -746,6 +746,7 @@ namespace Util
                 if (null != pagination)
                     pagination.setView(pageNum, currentPageIndex + 1);
             }
+            //wrapOnClipMove();
         }
 
         public void RefreshByReset(bool isReset, params IStuff[] dataArray)
@@ -760,6 +761,16 @@ namespace Util
 
             alignTargetIndex = isReset ? 0 : alignTargetIndex;
             display(alignTargetIndex, 0, dataArray);
+        }
+
+        public void testMoveUp() 
+        {
+            if (null != this.mScroll) 
+            {
+                SpringPanel.Begin(mPanel.cachedGameObject,
+                    mPanel.cachedTransform.localPosition + childWarpSpan, springStrength).onFinished = null;
+            }
+        
         }
 
         public void setPagination(Transform markContainer, Transform markItem)
