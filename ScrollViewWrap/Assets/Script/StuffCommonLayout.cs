@@ -94,6 +94,7 @@ namespace Util
         private Pagination pagination = null;
         private int alignOffset = 0;
 
+        private bool isTrimming = false;
         # endregion
 
         //确定整个结构正常
@@ -260,7 +261,6 @@ namespace Util
                     }
                 }
             }
-            
 
             Vector3 leftTopCellHangingPoint = getLeftTopCellHangingPoint();
             if (null != childInfoList && childInfoList.Count > 0)
@@ -282,7 +282,6 @@ namespace Util
                             int teamIndex = isHorizontal ? j : i;
                             int indexInTeam = isHorizontal ? i : j;
 
-                            //td.rowIndex = i;
                             it_cell.Current.rowIndex = getCalculatedRowIndex(i, alignOffset);
                             it_cell.Current.colIndex = getCalculatedColIndex(j, alignOffset);
                             updateChild(it_cell.Current);
@@ -438,7 +437,21 @@ namespace Util
             if (null != pagination)
                 pagination.updateView(currentPageIndex + 1);
 
-            if (!mScroll.isDragging) trimOnDragFinish();
+            if (mScroll.isDragging)
+            {
+                isTrimming = false;
+            }
+            else 
+            {
+                if (isTrimming)
+                {
+                    orderMove(); //可修改成任意位置的弹动
+                }
+                else 
+                {
+                    if (isAutoTrim) trimOnDragFinish();
+                }
+            }
         }
 
         private void setTeamPosWhenWrap(List<ChildInfo> team, Vector3 posOffset)
@@ -592,10 +605,19 @@ namespace Util
             if (!mScroll.canMoveHorizontally) springOffset.x = 0f;
             if (!mScroll.canMoveVertically) springOffset.y = 0f;
             springOffset.z = 0f;
-
+            isTrimming = true;
             SpringPanel.Begin(mPanel.cachedGameObject,
-                    mPanel.cachedTransform.localPosition - springOffset, springStrength).onFinished = null;
+                    mPanel.cachedTransform.localPosition - springOffset, springStrength).onFinished = () => { isTrimming = false; };
         }
+
+        private void orderMove() 
+        {
+            Vector3 sm = new Vector3(springOffset.x + childSize.x, springOffset.y - childSize.y, springOffset.z);
+            Debug.Log("))))))))))))))))))))))))))))) + selfmove" + sm.y);
+            SpringPanel.Begin(mPanel.cachedGameObject,
+                    mPanel.cachedTransform.localPosition - springOffset, springStrength).onFinished = () => { isTrimming = false; };
+        }
+
 
         #endregion
         // --------------------------------------------------------------------------------------
@@ -765,12 +787,17 @@ namespace Util
 
         public void testMoveUp() 
         {
+            bool temp = isAutoTrim;
+            isAutoTrim = false;
+            Vector3 mcl = new Vector3(mPanel.cachedTransform.localPosition.x, mPanel.cachedTransform.localPosition.y + childSpan * 3f, mPanel.cachedTransform.localPosition.z);
             if (null != this.mScroll) 
             {
                 SpringPanel.Begin(mPanel.cachedGameObject,
-                    mPanel.cachedTransform.localPosition + childWarpSpan, springStrength).onFinished = null;
+                    mcl, springStrength).onFinished = null;
             }
-        
+            Debug.Log("===========================>" + mPanel.height);
+            Debug.Log("===========================>" + childSpan);
+            isAutoTrim = temp;
         }
 
         public void setPagination(Transform markContainer, Transform markItem)

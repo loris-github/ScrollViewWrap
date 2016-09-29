@@ -51,7 +51,7 @@ public class TestObject1: MonoBehaviour {
 
         public void OnChildClick(GameObject go) 
         {
-            Debug.Log("当前的方块数字是：" + id);
+            //Debug.Log("当前的方块数字是：" + id);
             //bool isRemoved = false;
             //if (null != list && list.Contains(this))
             //{
